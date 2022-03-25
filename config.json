@@ -1,0 +1,12 @@
+{
+    "img_width":  100,
+    "img_height": 100,
+    "section_names": [ "caule", "flor", "folha", "fruto" ],
+    "plant_names": [
+        "caesalpinia_pulcherrima",
+        "chamaecrista_desvauxii",
+        "crotalaria_retusa",
+        "hymenaea_coubaril",
+        "leucaena_leucocephala"
+    ]
+}

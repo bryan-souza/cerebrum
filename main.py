@@ -10,7 +10,7 @@ logging.getLogger('tensorflow').setLevel(logging.FATAL)
 import json
 import numpy as np
 
-from typing import Tuple, Union
+from typing import Tuple, Union, Any
 from pathlib import Path
 from tensorflow.nn import softmax
 from tensorflow import expand_dims
@@ -24,7 +24,16 @@ MODELS_PATH   = Path(CEREBRUM_PATH, 'models')
 CONFIG_FILE   = Path(CEREBRUM_PATH, 'config.json')
 
 
-class Identifier():
+class MetaIdentifier(type):
+    _instances = {}
+
+    def __call__(cls, *args: Any, **kwargs: Any) -> Any:
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
+
+class Identifier(metaclass=MetaIdentifier):
     def __init__(self) -> None:
         config = json.load( open(CONFIG_FILE) )
 
@@ -65,4 +74,3 @@ class Identifier():
         accuracy = 100 * np.max(score)
 
         return ( plant_name, accuracy )
-

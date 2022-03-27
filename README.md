@@ -4,6 +4,7 @@ Módulo python criado para a identificação de plantas da família das fabácea
 
 # O que há de novo?
 
+* Adição de *unit tests* usando [pytest](https://docs.pytest.org/en/7.1.x/)
 * Criação de um repositório dedicado
 
 # Utilização

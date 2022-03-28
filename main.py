@@ -14,10 +14,9 @@ import numpy as np
 from typing import Generator, Tuple, Union
 from pathlib import Path
 
-from tensorflow.python.ops.nn import softmax
+from tensorflow.nn import softmax
 from tensorflow import expand_dims
-from tensorflow.python.keras.models import load_model
-# FIXME: Fix import
+from tensorflow.keras.models import load_model
 from tensorflow.keras.utils import load_img, img_to_array
 
 

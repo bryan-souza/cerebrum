@@ -45,6 +45,14 @@ def all_plants():
     }
 
 class TestIdentifier:
+    def test_singleton(self):
+        instance_one = Identifier()
+        instance_two = Identifier()
+
+        assert isinstance(instance_one, Identifier)
+        assert isinstance(instance_two, Identifier)
+        assert instance_one == instance_two
+
     def test_section_identification(self, plant_data):
         section, img_array = identifier._identify_section( plant_data['path'] )
 

@@ -1,5 +1,6 @@
 import os
 import logging
+from typing_extensions import Self
 
 # Set logging to error
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # FATAL
@@ -24,16 +25,15 @@ MODELS_PATH   = Path(CEREBRUM_PATH, 'models')
 CONFIG_FILE   = Path(CEREBRUM_PATH, 'config.json')
 
 
-class MetaIdentifier(type):
+class Identifier(object):
     _instances = {}
 
-    def __call__(cls, *args: Any, **kwargs: Any) -> Any:
+    def __new__(cls: type[Self]) -> Self:
         if cls not in cls._instances:
-            instance = super().__call__(*args, **kwargs)
+            instance = super().__new__(cls)
             cls._instances[cls] = instance
         return cls._instances[cls]
 
-class Identifier(metaclass=MetaIdentifier):
     def __init__(self) -> None:
         config = json.load( open(CONFIG_FILE) )
 

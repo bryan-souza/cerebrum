@@ -11,11 +11,13 @@ logging.getLogger('tensorflow').setLevel(logging.FATAL)
 import json
 import numpy as np
 
-from typing import Tuple, Union, Any
+from typing import Generator, Tuple, Union
 from pathlib import Path
-from tensorflow.nn import softmax
+
+from tensorflow.python.ops.nn import softmax
 from tensorflow import expand_dims
-from tensorflow.keras.models import load_model
+from tensorflow.python.keras.models import load_model
+# FIXME: Fix import
 from tensorflow.keras.utils import load_img, img_to_array
 
 
@@ -44,8 +46,7 @@ class Identifier(object):
         self.MODELS           = dict([ model for model in self._load_models() ])
 
     @staticmethod
-    # TODO: Specify return type annotation
-    def _load_models():
+    def _load_models() -> Generator:
         for model in MODELS_PATH.iterdir():
             class_name = str(model.stem)
             yield ( class_name, load_model(model) )

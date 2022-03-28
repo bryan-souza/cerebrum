@@ -11,7 +11,7 @@ logging.getLogger('tensorflow').setLevel(logging.FATAL)
 import json
 import numpy as np
 
-from typing import Generator, Tuple, Union
+from typing import Generator, Tuple, Union, Type
 from pathlib import Path
 
 from tensorflow.nn import softmax
@@ -29,7 +29,7 @@ CONFIG_FILE   = Path(CEREBRUM_PATH, 'config.json')
 class Identifier(object):
     _instances = {}
 
-    def __new__(cls: type[Self]) -> Self:
+    def __new__(cls: Type[Self]) -> Self:
         if cls not in cls._instances:
             instance = super().__new__(cls)
             cls._instances[cls] = instance

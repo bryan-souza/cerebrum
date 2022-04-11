@@ -41,6 +41,11 @@ def all_plants():
             'path'    : Path(TEST_PHOTOS_DIR, 'FrutoHC1.jpg'),
             'section' : 'fruto',
             'plant'   : 'hymenaea_coubaril'
+        },
+        'FrutoHV18' : {
+            'path'    : Path(TEST_PHOTOS_DIR, 'FrutoHV18.jpg'),
+            'section' : 'fruto',
+            'plant'   : 'hymenaea_velutina'
         }
     }
 

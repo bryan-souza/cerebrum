@@ -1,23 +1,12 @@
-import os
-import logging
-from typing_extensions import Self
-
-# Set logging to error
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # FATAL
-logging.getLogger('tensorflow').setLevel(logging.FATAL)
-
-
-
 import json
+import pickle
+from typing import List
+
+from typing import Tuple, Union, Type
+from pathlib import Path
 import numpy as np
 
-from typing import Generator, Tuple, Union, Type
-from pathlib import Path
-
-from tensorflow.nn import softmax
-from tensorflow import expand_dims
-from tensorflow.keras.models import load_model
-from tensorflow.keras.utils import load_img, img_to_array
+from orangecontrib.imageanalytics.image_embedder import ImageEmbedder
 
 
 # Constants
@@ -29,7 +18,7 @@ CONFIG_FILE   = Path(CEREBRUM_PATH, 'config.json')
 class Identifier(object):
     _instances = {}
 
-    def __new__(cls: Type[Self]) -> Self:
+    def __new__(cls):
         if cls not in cls._instances:
             instance = super().__new__(cls)
             cls._instances[cls] = instance
@@ -38,39 +27,28 @@ class Identifier(object):
     def __init__(self) -> None:
         config = json.load( open(CONFIG_FILE) )
 
-        self.DEFAULT_IMG_SIZE = ( config['img_width'], config['img_height'] )
-        self.IMG_SIZE         = self.DEFAULT_IMG_SIZE
+        self.IMG_SIZE         = ( config['img_width'], config['img_height'] )
         self.SECTION_NAMES    = config['section_names']
         self.PLANT_NAMES      = config['plant_names']
-        self.MODELS           = dict([ model for model in self._load_models() ])
+        self.MODELS           = {}
 
-    @staticmethod
-    def _load_models() -> Generator:
         for model in MODELS_PATH.iterdir():
             class_name = str(model.stem)
-            yield ( class_name, load_model(model) )
-
-
-    def _identify_section(self, path: str) -> Tuple[str, np.array]:
-        model = self.MODELS['section']
-        img = load_img( path, target_size=self.IMG_SIZE )
-        img_array = img_to_array(img)
-        img_array = expand_dims(img_array, 0)
-
-        predictions = model.predict(img_array)
-        score = softmax( predictions[0] )
-        class_name = self.SECTION_NAMES[ np.argmax(score) ]
-
-        return ( class_name, img_array )
-
+            self.MODELS.update({ class_name: pickle.load( open(model, 'rb') ) })
 
     def identify_plant(self, path: Union[str, Path]) -> Tuple[str, float]:
-        class_name, img_array = self._identify_section(path)
-        model = self.MODELS[ class_name ]
+        with ImageEmbedder(model='squeezenet') as emb:
+            embeddings = emb([ str(path) ])
+            section_pred, _ = self.MODELS['orgaos'].predict(embeddings)
+            section = self.SECTION_NAMES[ int(section_pred) ]
 
-        predictions = model.predict(img_array)
-        score = softmax( predictions[0] )
-        plant_name = self.PLANT_NAMES[ np.argmax(score) ]
-        accuracy = 100 * np.max(score)
+            plant_pred, weights = self.MODELS[section].predict(embeddings)
+            plant = self.PLANT_NAMES[ int(plant_pred) ]
+            accuracy = 100 * np.max( self.softmax(weights) )
 
-        return ( plant_name, accuracy )
+            return (plant, accuracy)
+
+
+    @staticmethod
+    def softmax(data: List[float]) -> List[float]:
+        return np.exp(data) / np.sum(np.exp(data))

@@ -2,7 +2,6 @@ import random
 import re
 
 import numpy as np
-from tensorflow.python.framework.ops import EagerTensor
 
 from cerebrum.main import Identifier
 from .fixtures import plant_data, all_caules, all_flores, all_folhas, all_frutos
@@ -20,12 +19,6 @@ class TestIdentifier:
         assert isinstance(instance_two, Identifier)
         assert instance_one == instance_two
 
-    def test_section_identification(self, plant_data):
-        section, img_array = identifier._identify_section( plant_data['path'] )
-
-        assert type(section) == str
-        assert type(img_array) == EagerTensor
-        assert section == plant_data['section']
 
     def test_plant_identification(self, plant_data):
         plant, accuracy = identifier.identify_plant( plant_data['path'] )
